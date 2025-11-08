@@ -1,0 +1,21 @@
+{"config_output":
+	[
+		{"general": 
+			[
+				{"X_limit": [0,1000,5000]},{"moving_frame_velocity" :[0,22.25]},{"time_interval_print" :[0,10]},{"start_end_time":[0,5,17]},
+				{"conservation_analysis":[0,"0=false","1=true"]}, 
+				{"parameter_name_array" :[1,["Ex","Num_Den_ion","Num_Den_elc"],
+							                  
+							["EPP_electron"],["Momentum_electron","Momentum_ion"],["Ene_Kin_electron","Ene_Kin_ion"],["DF_electron","DF_ion","Momentum_electron","Momentum_ion","Ex","PHI"],
+					["DF_electron","DF_ion","Momentum_electron","Momentum_ion","Ex","PHI","Ene_Kin_ion","Ene_Kin_electron","Momentum_electron","Momentum_ion", "MomentumAll"]]},
+				{"number_random_sampling":10}
+			]},
+		{"species_dependent": 
+			[
+				{"Velocity_limit": [0,-0.7,0.7]},{"Velocity_limit": [0,-2.0,2.0]},{"Velocity_limit": [0,-2.0,2.0]}
+			]}
+			
+		
+
+	]
+}

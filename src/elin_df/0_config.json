@@ -1,0 +1,43 @@
+{"config":
+  [
+    {"N_species":1},
+    {"PhasePoint":
+      [
+	{"Species":
+	  [
+	    {"Name":"elc"},{"Mass":0.00054461781},
+	    {"Charge":-1.0},{"Temperature":100},{"Den_Ratio_b":1.0},
+	    {"Density":1.0},{"Alpha":0.05},{"NoW":1},
+	    {"pX":4},{"pVx":4},{"nVx":12000},
+	    {"Vx_min":-6.0},{"Vx_max":6.0},
+	    {"DF_X_NMRE": 1},{"DF_Vx_MK":0},
+	    {"Kappa_DF": 25.0},{"Boltzmann_Relation" : 0},
+	    {"DF_NotShifted_Shifted":1}
+	  ]
+	},
+	{"Species":
+	  [
+	    {"Name":"ion"},{"Mass":1.0},
+	    {"Charge":1.0},{"Temperature":1.0},{"Den_Ratio_b":1.0},
+	    {"Density":1.0},{"Alpha":0.0},{"NoW":1},
+	    {"pX":1},{"pVx":1},{"nVx":2000},
+	    {"Vx_min":-10.0},{"Vx_max":10.0},
+	    {"DF_X_NMRE": 0},{"DF_Vx_MK":0},
+	    {"Kappa_DF": 25.0},{"Boltzmann_Relation" : 0},
+	    {"DF_NotShifted_Shifted":1}
+	  ]
+	}
+      ]
+    },
+    {"Grid":
+      [
+	{"nX": 2000 },{"X_min":0.0},{"X_max":2000.0}
+      ]
+    },
+    {"Time":
+	[{"N_Time":1000},{"d_Time":0.1},
+	 {"Num_Spatial_Output":1000},{"Num_Contour":1000},{"Plasma_approximation":0},{"convergance_step":0}
+      ]
+    }
+  ]
+}

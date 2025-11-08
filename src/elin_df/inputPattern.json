@@ -1,0 +1,2 @@
+{"inputPattern":[
+"X", "PHI", "Ex","U0","Density_elc", "Density_ion", "FirstMoment_elc", "FirstMoment_ion", "SecondMoment_elc", "SecondMoment_ion", "Temperature_elc", "Temperature_ion","DF_elc","DF_ion"]}

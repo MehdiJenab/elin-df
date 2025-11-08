@@ -23,3 +23,6 @@ Homepage = "https://github.com/MehdiJenab/elin-df"
 
 [tool.setuptools.packages.find]
 where = ["src"]
+
+[project.scripts]
+elin-df-demo = "elin_df.cli:main"

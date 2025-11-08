@@ -1,0 +1,2 @@
+[console_scripts]
+elin-df-demo = elin_df.cli:main

@@ -1,0 +1,6 @@
+{"config_solitons":
+	[
+		{"Number_Solitons":1},
+		{"Soliton":[{"Mach_Number": 3.0},  {"Beta_Schamel": -2.0},  {"Phi_max":50.5}, {"Alpha_Schamel":0.0}, {"left_side_of_soliton":1000 }]}
+	]
+}
