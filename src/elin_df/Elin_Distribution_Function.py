@@ -301,7 +301,7 @@ class ElinDistributionFunction():
 			integrand = []
 			for iVx in range(len(vxInput2d[iSlice])):
 				integrand.append(dfInput2d[iSlice][iVx] * vxInput2d[iSlice][iVx]**order)
-			integral += np.trapz(integrand,x=vxInput2d[iSlice])
+			integral += np.trapezoid(integrand, x=vxInput2d[iSlice])
 			#integral = integrate.simps(integrand,x=vxInput2d[iSlice])
 			#integral = integrate.romb(integrand)
 			del integrand

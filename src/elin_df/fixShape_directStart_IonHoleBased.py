@@ -42,6 +42,12 @@ from .MathFunctions 						import mathClass 				as math
 from .find_beta 						import FindBeta
 from .global_parameter import global_parameters
 
+from elin_df.file_utils import (
+    remove_trailing_comma, 
+    write_json_section_end,
+    get_script_directory
+)
+
 p = global_parameters()
 m  = math()
 
@@ -56,6 +62,10 @@ rc('legend', fontsize=15)
 #BEGIN global functions and expressions
 tab = "	"
 beginLine = "\n" + tab + tab
+
+# Get script directory for relative file paths
+import os
+SCRIPT_DIR = get_script_directory(__file__)
 def pause():
     programPause = input("Press to continue...")
 #END
@@ -104,7 +114,7 @@ class QuietStart(object):
 	#==========================================================================
 	def set_dataUnperturbed(self):
 		dataUnperturbed 		= []
-		with open('inputPattern.json') as data_file:
+		with open(os.path.join(SCRIPT_DIR, 'inputPattern.json')) as data_file:
 			data0 				= json.load(data_file)
 		inputPattern 			= data0['inputPattern']
 		pd = {} #pattern dictionary
@@ -233,13 +243,28 @@ class QuietStart(object):
 		stg += tab+tab
 		return stg
 
-	def write_headerEnding(self,file_DF):
-		file_DF.seek(-2, os.SEEK_END)
-		file_DF.truncate()
-		stg  = 					"\n"
-		stg += tab+tab	+ "]" +	"\n"
-		stg += tab		+ "},"+	"\n\n"
-		file_DF.write(stg)
+	def write_headerEnding(self, file_DF):
+		"""
+		Close a JSON section by:
+		1) Removing the trailing ', ' from the last element
+		2) Appending the standard section ending:
+			] 
+			},
+		"""
+		# make sure everything written so far is on disk
+		file_DF.flush()
+
+		# get the underlying file path
+		filepath = file_DF.name
+
+		# remove the trailing ", " at the very end of the file, if present
+		remove_trailing_comma(filepath, trailing=", ")
+
+		# append:
+		#   \n
+		#   \t\t]\n
+		#   \t},\n\n
+		write_json_section_end(filepath, indent_level=2)
 
 	def write_array(self,array):
 		stg = ""
@@ -267,7 +292,7 @@ class QuietStart(object):
 	#==========================================================================
 	def write_quietStartFile(self):
 		# writing the output file ---------------------------------------------
-		file_DF = open('QuietStart_Input.json', 'w')
+		file_DF = open(os.path.join(SCRIPT_DIR, 'QuietStart_Input.json'), 'w')
 
 		stg  = "{\n\"kinetic\":\n[\n\n"
 		stg += self.write_header("input_pattern")
@@ -328,7 +353,7 @@ class QuietStart(object):
 
 		beginLine = "\n" + tab + tab
 		#------------------------------
-		file_DF = open('QuietStart_Input.json', 'a')
+		file_DF = open(os.path.join(SCRIPT_DIR, 'QuietStart_Input.json'), 'a')
 		stg  = "\n"
 		stg += beginLine +"["
 		stg += beginLine
@@ -339,8 +364,11 @@ class QuietStart(object):
 
 		self.write_pair('df_'+nameElc,dfGqElc,file_DF)
 		self.write_pair('df_'+nameIon,dfGqIon,file_DF)
-		file_DF.seek(-2, os.SEEK_END)
-		file_DF.truncate()
+		file_DF.close()
+		# Safely remove trailing comma using utility (avoids seek/truncate on text mode)
+		remove_trailing_comma(os.path.join(SCRIPT_DIR, 'QuietStart_Input.json'))
+		# reopen and append the closing bracket for this entry
+		file_DF = open(os.path.join(SCRIPT_DIR, 'QuietStart_Input.json'), 'a')
 
 
 		stg = beginLine + "],  "
@@ -357,7 +385,7 @@ class QuietStart(object):
 		dataXpoint[self.pd["Temperature"	+"_"+NameSc]] = momentsTrapped[3]
 		beginLine = "\n" + tab + tab
 		#------------------------------
-		file_DF = open('QuietStart_Input.json', 'a')
+		file_DF = open(os.path.join(SCRIPT_DIR, 'QuietStart_Input.json'), 'a')
 		stg  = "\n"
 		stg += beginLine +"["
 		stg += beginLine
@@ -386,7 +414,7 @@ class QuietStart(object):
 
 	#==========================================================================
 	def finalize_write_quietStart(self):
-		file_DF = open('QuietStart_Input.json', 'a')
+		file_DF = open(os.path.join(SCRIPT_DIR, 'QuietStart_Input.json'), 'a')
 		self.write_headerEnding(file_DF)
 		file_DF.seek(-3, os.SEEK_END)
 		file_DF.truncate()
@@ -399,7 +427,7 @@ class QuietStart(object):
 	#==========================================================================
 	def read_input_file(self):
 		dataSoliton 			= []
-		with open('Fluid_Input_SelfConsistent.json') as data_file:
+		with open(os.path.join(SCRIPT_DIR, 'Fluid_Input_SelfConsistent.json')) as data_file:
 			data0 				= json.load(data_file)
 
 		inputPattern 			= data0['fluid'][0]['input_pattern']
@@ -448,7 +476,7 @@ class QuietStart(object):
 	#BEGIN fitting Elin DF on top of ni=ne
 
 	def insert_fixedSoliton(self):
-		file_DF = open('QuietStart_Input.json', 'a')
+		file_DF = open(os.path.join(SCRIPT_DIR, 'QuietStart_Input.json'), 'a')
 		goldenRatio = 1.618
 		l 		= 20.0#15.0
 		a 		= l*goldenRatio*0.1 #20.0
@@ -465,7 +493,7 @@ class QuietStart(object):
 		self.get_ElinDF_elc_ion(dataFixed)# <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 		# <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
-		file_DF = open('QuietStart_Input.json', 'a')
+		file_DF = open(os.path.join(SCRIPT_DIR, 'QuietStart_Input.json'), 'a')
 		self.write_headerEnding(file_DF)
 		file_DF.close()
 		#pause()
@@ -480,13 +508,13 @@ class QuietStart(object):
 		a 		= l*goldenRatio*0.1
 		machNumber  = -4
 		v_soliton 	= machNumber * p.ion_sound_velocity
-		file_DF = open('QuietStart_Input.json', 'a')
+		file_DF = open(os.path.join(SCRIPT_DIR, 'QuietStart_Input.json'), 'a')
 		file_DF.write( self.write_header("soliton_Data"))
 		file_DF.close()
 		dataFixed = self.setFixedSoliton(n=4,a=a,l=l,x0=x0,vElc=v_soliton,vIon=v_holeIon)
 		#self.get_ElinDF_elc_ion(dataFixed) # <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
-		file_DF = open('QuietStart_Input.json', 'a')
+		file_DF = open(os.path.join(SCRIPT_DIR, 'QuietStart_Input.json'), 'a')
 		self.write_headerEnding(file_DF)
 		file_DF.close()
 
@@ -501,13 +529,13 @@ class QuietStart(object):
 		#a 		= l*goldenRatio*0.5
 		#machNumber  = 45
 		#v_soliton 	= machNumber * p.ion_sound_velocity
-		#file_DF = open('QuietStart_Input.json', 'a')
+		#file_DF = open(os.path.join(SCRIPT_DIR, 'QuietStart_Input.json'), 'a')
 		#file_DF.write( self.write_header("soliton_Data"))
 		#file_DF.close()
 		#dataFixed = self.setFixedSoliton(a=a,l=l,x0=x0,vElc=v_soliton,vIon=v_holeIon)
 		##self.get_ElinDF_elc_ion(dataFixed) # <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
-		#file_DF = open('QuietStart_Input.json', 'a')
+		#file_DF = open(os.path.join(SCRIPT_DIR, 'QuietStart_Input.json'), 'a')
 		#self.write_headerEnding(file_DF)
 		#file_DF.close()
 		##----------------------------------------------------------------------
@@ -521,13 +549,13 @@ class QuietStart(object):
 		#a 		= l*goldenRatio
 		#machNumber  = 30
 		#v_soliton 	= machNumber * p.ion_sound_velocity
-		#file_DF = open('QuietStart_Input.json', 'a')
+		#file_DF = open(os.path.join(SCRIPT_DIR, 'QuietStart_Input.json'), 'a')
 		#file_DF.write( self.write_header("soliton_Data"))
 		#file_DF.close()
 		#dataFixed = self.setFixedSoliton(a=a,l=l,x0=x0,vElc=v_soliton,vIon=v_holeIon)
 		##self.get_ElinDF_elc_ion(dataFixed) # <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
-		#file_DF = open('QuietStart_Input.json', 'a')
+		#file_DF = open(os.path.join(SCRIPT_DIR, 'QuietStart_Input.json'), 'a')
 		#self.write_headerEnding(file_DF)
 		#file_DF.close()
 		##----------------------------------------------------------------------
@@ -540,13 +568,13 @@ class QuietStart(object):
 		#a 		= l*goldenRatio*0.25
 		#machNumber  = 45
 		#v_soliton 	= machNumber * p.ion_sound_velocity
-		#file_DF = open('QuietStart_Input.json', 'a')
+		#file_DF = open(os.path.join(SCRIPT_DIR, 'QuietStart_Input.json'), 'a')
 		#file_DF.write( self.write_header("soliton_Data"))
 		#file_DF.close()
 		#dataFixed = self.setFixedSoliton(a=a,l=l,x0=x0,vElc=v_soliton,vIon=v_holeIon)
 		##self.get_ElinDF_elc_ion(dataFixed) # <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
-		#file_DF = open('QuietStart_Input.json', 'a')
+		#file_DF = open(os.path.join(SCRIPT_DIR, 'QuietStart_Input.json'), 'a')
 		#self.write_headerEnding(file_DF)
 		#file_DF.close()
 		##----------------------------------------------------------------------
@@ -560,13 +588,13 @@ class QuietStart(object):
 		#a 		= l*goldenRatio*0.5
 		#machNumber  = 30
 		#v_soliton 	= machNumber * p.ion_sound_velocity
-		#file_DF = open('QuietStart_Input.json', 'a')
+		#file_DF = open(os.path.join(SCRIPT_DIR, 'QuietStart_Input.json'), 'a')
 		#file_DF.write( self.write_header("soliton_Data"))
 		#file_DF.close()
 		#dataFixed = self.setFixedSoliton(a=a,l=l,x0=x0,vElc=v_soliton,vIon=v_holeIon)
 		##self.get_ElinDF_elc_ion(dataFixed) # <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
-		#file_DF = open('QuietStart_Input.json', 'a')
+		#file_DF = open(os.path.join(SCRIPT_DIR, 'QuietStart_Input.json'), 'a')
 		#self.write_headerEnding(file_DF)
 		#file_DF.close()
 		#----------------------------------------------------------------------

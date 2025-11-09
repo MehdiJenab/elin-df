@@ -5,6 +5,9 @@ import os
 import json
 import numpy as np
 
+# Get module directory for relative file paths
+MODULE_DIR = os.path.dirname(os.path.abspath(__file__))
+
 
 
 
